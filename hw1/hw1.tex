@@ -1,0 +1,111 @@
+% You should title the file with a .tex extension (hw1.tex, for example)
+\documentclass[11pt]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{enumerate}
+\usepackage[hang,flushmargin]{footmisc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{collectbox}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage[T1]{fontenc}
+\usepackage{complexity}
+
+\newcommand{\mybox}{%
+    \collectbox{%
+        \setlength{\fboxsep}{4pt}%
+        \fbox{\BOXCONTENT}%
+    }%
+}
+
+\newcommand{\legendre}[2]{\ensuremath{\left( \frac{#1}{#2} \right) }}
+
+\oddsidemargin0cm
+\topmargin-2cm     %I recommend adding these three lines to increase the 
+\textwidth16.5cm   %amount of usable space on the page (and save trees)
+\textheight23.5cm  
+
+\newcommand{\question}[1] {\vspace{.3in} \hrule\vspace{0.3em}
+\noindent{\bf #1} \vspace{0.7em}
+\hrule \vspace{.10in}}
+\renewcommand{\part}[1] {\vspace{.10in} {\bf (#1)}}
+
+\newcommand{\myinfo}{Albert Gao / sixiangg}
+\newcommand{\myhwnum}{1}
+\newcommand{\currdate}{09/22/2022}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+ 
+\pagestyle{fancyplain}
+\lhead{\fancyplain{}{\textbf{HW\myhwnum}}}      % Note the different brackets!
+\rhead{\fancyplain{}{\bigskip\myinfo}}
+\chead{\fancyplain{}{15-859}}
+
+\begin{document}
+
+\bigskip                        % Skip a "medium" amount of space
+                                % (latex determines what medium is)
+                                % Also try: \bigskip, \littleskip
+
+\thispagestyle{plain}
+\begin{center}                  % Center the following lines
+{\Huge 15-859 Assignment \#\myhwnum}
+
+\vspace{0.3cm}
+
+\large{\myinfo { / section 1A}}
+
+\large{\currdate}
+
+\end{center}
+
+\question{Task 1}
+\begin{enumerate}[1.]
+\item \begin{proof}
+Let $z_i = x_iy_i$ then observe that
+\begin{align*}
+\langle x^{\otimes p}, y^{\otimes p}\rangle &= \sum_{i_1, i_2, \cdots i_p} \prod_{l \in [p]}x_{i_l}y_{i_l}\\
+&= \sum_{i_1, i_2, \cdots, i_p} \prod_{l \in [p]} z_{i_l}\\
+&= (z_1 + \cdots + z_d)^p\\
+&= \langle x, y\rangle^p. \qedhere
+\end{align*}
+\end{proof}
+\item \begin{proof}
+Let $A_i$ denote $i$th row of $A$. Then for each $i \in [n]$, we have $M_i = A_i^{\otimes p/2}$. Then indeed $M$ is a $n \times d^{p/2}$ matrix. It is also clear that
+\begin{align*}
+    ||Mx^{\otimes p/2}||_2^2 &= \sum_{i \in [n]}{\langle M_i, x^{\otimes p/2}\rangle^2}\\
+    &= \sum_{i \in [n]} \langle A_i, x \rangle^{p/2 \times 2}\\
+    &= ||Ax||_p^p.
+\end{align*}
+To construct $M$, each entry is a $p/2$ product, so it takes $O(nd^{p/2}(p/2)) = n \cdot \text{poly}(d)$ time. Also, by discussion in class / problem statement, we may let $S$ be a random $s \times n$ Gaussian matrix, where $s = O(d^{p/2}/\epsilon^2)$, such that with probability at least $9/10$,
+\begin{align*}
+    \forall x \in \mathbb{R}^{d^(p/2)}, ||SMx||_2^2 &= (1 \pm \epsilon)||Mx||_2^2\\
+    \Rightarrow \forall x \in \mathbb{R}^d, ||SMx^{\otimes p/2}||_2^2 &= (1 \pm \epsilon)||Mx^{\otimes p/2}||_2^2\\
+    &= (1 \pm \epsilon)||Ax||_p^p.
+\end{align*}
+Finally, to compute $SM$ we need only to perform $O(d^{p/2}/\epsilon^2)d^{p/2}$ dot products of vectors of length $n$, which takes in total $n \cdot \text{poly}(d)$ time.
+\end{proof}
+\item \begin{proof}
+In the special case when $A$ is Vandermonde, we no longer need all $d^{p/2}$ columns of $M$ because of repetitive entries. Let $S_k$ denote indices in $A_i^{\otimes p}$ for which the entries equal $y_i^k$. Then let $M'$ have rows $(1, y_i, \cdots, y_i^{p(d-1)})$. Let $y$ be a $p(d-1)+1$ length vector such that $y_k = \sum_{l \in S_k} x_l^{\otimes p/2}$. Then using same theorem in class / what the problem statement mentions, we can have matrix $S$ appropriatedly scaled Gaussian with $O(p(d-1)/\epsilon^2) = O(dp/\epsilon^2)$ rows such that with at least $9/10$ probability,
+\begin{align*}
+    ||SMx^{\otimes p/2}||_2^2 = ||SM'y||_2^2 &= (1 \pm \epsilon)||M'y||_2^2\\
+    &= (1 \pm \epsilon)||Mx^{\otimes p/2}||_2^2\\
+    &= (1 \pm \epsilon)||Ax||_p^p. \qedhere
+\end{align*}
+\end{proof}
+\end{enumerate}
+
+
+\newpage
+\question{Task 2}
+
+
+
+
+\end{document}  

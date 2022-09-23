@@ -1,0 +1,78 @@
+% You should title the file with a .tex extension (hw1.tex, for example)
+\documentclass[11pt]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{enumerate}
+\usepackage[hang,flushmargin]{footmisc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{collectbox}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage[T1]{fontenc}
+\usepackage{complexity}
+
+\newcommand{\mybox}{%
+    \collectbox{%
+        \setlength{\fboxsep}{4pt}%
+        \fbox{\BOXCONTENT}%
+    }%
+}
+
+\newcommand{\legendre}[2]{\ensuremath{\left( \frac{#1}{#2} \right) }}
+
+\oddsidemargin0cm
+\topmargin-2cm     %I recommend adding these three lines to increase the 
+\textwidth16.5cm   %amount of usable space on the page (and save trees)
+\textheight23.5cm  
+
+\newcommand{\question}[1] {\vspace{.3in} \hrule\vspace{0.3em}
+\noindent{\bf #1} \vspace{0.7em}
+\hrule \vspace{.10in}}
+\renewcommand{\part}[1] {\vspace{.10in} {\bf (#1)}}
+
+\newcommand{\myinfo}{Albert Gao / sixiangg}
+\newcommand{\myhwnum}{1}
+\newcommand{\currdate}{09/22/2022}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+ 
+\pagestyle{fancyplain}
+\lhead{\fancyplain{}{\textbf{HW\myhwnum}}}      % Note the different brackets!
+\rhead{\fancyplain{}{\bigskip\myinfo}}
+\chead{\fancyplain{}{15-859}}
+
+\begin{document}
+
+\bigskip                        % Skip a "medium" amount of space
+                                % (latex determines what medium is)
+                                % Also try: \bigskip, \littleskip
+
+\thispagestyle{plain}
+\begin{center}                  % Center the following lines
+{\Huge 15-859 Assignment \#\myhwnum}
+
+\vspace{0.3cm}
+
+\large{\myinfo { / section 1A}}
+
+\large{\currdate}
+
+\end{center}
+
+\question{Task 1}
+
+
+
+\newpage
+\question{Task 2}
+
+
+
+
+\end{document}
