@@ -1,0 +1,314 @@
+% You should title the file with a .tex extension (hw1.tex, for example)
+\documentclass[11pt]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{enumerate}
+\usepackage[hang,flushmargin]{footmisc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{collectbox}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage[T1]{fontenc}
+\usepackage{complexity}
+
+\newcommand{\mybox}{%
+    \collectbox{%
+        \setlength{\fboxsep}{4pt}%
+        \fbox{\BOXCONTENT}%
+    }%
+}
+
+\newcommand{\legendre}[2]{\ensuremath{\left( \frac{#1}{#2} \right) }}
+
+\oddsidemargin0cm
+\topmargin-2cm     %I recommend adding these three lines to increase the 
+\textwidth16.5cm   %amount of usable space on the page (and save trees)
+\textheight23.5cm  
+
+\newcommand{\question}[1] {\vspace{.3in} \hrule\vspace{0.3em}
+\noindent{\bf #1} \vspace{0.7em}
+\hrule \vspace{.10in}}
+\renewcommand{\part}[1] {\vspace{.10in} {\bf (#1)}}
+
+\newcommand{\myinfo}{Albert Gao / sixiangg}
+\newcommand{\myhwnum}{2}
+\newcommand{\currdate}{10/16/2022}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+ 
+\pagestyle{fancyplain}
+\lhead{\fancyplain{}{\textbf{HW\myhwnum}}}      % Note the different brackets!
+\rhead{\fancyplain{}{\bigskip\myinfo}}
+\chead{\fancyplain{}{15-859}}
+
+\begin{document}
+
+\bigskip                        % Skip a "medium" amount of space
+                                % (latex determines what medium is)
+                                % Also try: \bigskip, \littleskip
+
+\thispagestyle{plain}
+\begin{center}                  % Center the following lines
+{\Huge 15-859 Assignment \#\myhwnum}
+
+\vspace{0.3cm}
+
+\large{\myinfo { / section 1A}}
+
+\large{\currdate}
+
+\end{center}
+
+\question{Task 1}
+\begin{enumerate}[1.]
+\item \begin{proof}
+We may let $A = U\Sigma V^T$ be its singular value decomp. And if $u_i$ is the $i$th row of $U$, written as a column vector, then we have
+\begin{align*}
+  a_i^T &= u_i^T\Sigma V^T\\
+  \Rightarrow a_i^T (A^T A)^{-1}a_i &= a_i^T (V \Sigma U^T U \Sigma V^T)^{-1} a_i\\
+  &= u_i^T \Sigma V^T (V \Sigma^2 V^T)^{-1} V \Sigma u_i\\
+  &= u_i^T \Sigma V^T V (\Sigma^2)^{-1} V^T V \Sigma u_i\\
+  &= u_i^T u_i\\
+  &= l_i.
+\end{align*}
+Note that the invertibility of $A^TA$ comes from the fact that $A$ has rank $d$.
+\end{proof}
+\item \begin{enumerate}[(a)]
+\item \begin{proof}
+Let's first show that $A^T_{i-1}A_{i-1} + \lambda I$ is invertible for any $i \ge 1$. Note that $x^TA^T_{i-1}A_{i-1}x \ge 0$ so $A^T_{i-1}A_{i-1}$ is positive semidefinite. It is also then clear that $S_i = A^T_{i-1}A_{i-1} + \lambda I$ is positive definite. This implies that $S_i$ has strictly positive eigenvalues and thus is invertible. By Matrix Determinant Lemma we then have that
+\begin{align*}
+  \det(S_{i+1}) &= 
+  \det(S_i + a_i a_i^T)\\ &= (\det S_i)(1 + a_i^T(A^T_{i-1} A_{i} + \lambda I)^{-1} a_i) \\
+  &\ge \det (S_i)(1 + l_i)\\
+  &\ge \det (S_i) e^{l_i/2}. &\text{By calculus and that }0 < l_i \le 1
+\end{align*}
+Note that the first equality comes from the observation that for any matrices $A,B$ we have $AB = \sum_k A_{*k} B_{k*}$.
+Then we may conclude that 
+\begin{align*} 
+\det (A^T A + \lambda I) &= \det(S_{n+1})\\
+&\ge \det(S_n)e^{l_n/2}\\
+&\ge \det(S_1)e^{\sum_1^n l_i/2}\\
+&= \det(\lambda I) \exp\left(\sum l_i/2\right). \qedhere 
+\end{align*}
+\end{proof}
+\item \begin{proof}
+We first note that determinant of a square matrix is the product of its eigenvalues, that singular values and eigen values coincide for real symmetric positive definite matrices, and that the top singular value is just the operator norm of the matrix. Combining these facts gives 
+\begin{align*}
+  \det(A^TA + \lambda I) &= \prod_i \lambda_i &\text{the eigenvalues}\\
+  &= \prod_i \sigma_i &\text{the singular values}\\
+  &\le \sigma_1^{d} &\text{positive definite}\\
+  &= \| A^T A + \lambda I\|_2^d\\
+  &= \left(\|A^T A\|_2 + \lambda \right)^d\\
+  &= \left(\sup_x x^T A^T A x + \lambda \right)^d &\text{3.13 from 15-884 linalg resource}\\
+  &= \left(\|A\|_2^2 + \lambda\right)^d. \qedhere 
+\end{align*}
+\end{proof}
+\end{enumerate}
+Combining the above two lemmas gives us that
+\begin{align*}
+\det(\lambda I) \exp(\sum l_i/2) &\le (\|A\|_2^2 + \lambda)^d\\
+\Rightarrow \exp(\sum l_i/2) &\le \left(\frac{\|A\|_2^2 + \lambda}{\lambda}\right)^d\\
+\Rightarrow \sum l_i/2 &\le d\log(1 + \|A\|_2^2/\lambda)\\
+\Rightarrow \sum l_i &= O(d\log(1 + \|A\|_2^2/\lambda)).
+\end{align*}
+\end{enumerate}
+
+
+\newpage
+\question{Task 2}
+\begin{enumerate}[1.]
+\item \begin{enumerate}[(a)]
+\item \begin{proof}
+Expanding with SVD gives us 
+\begin{align*}
+  y &= (AA^T)^r Ag\\
+  &= (U\Sigma V^T V \Sigma U^T)^r Ag\\
+  &= (U \Sigma^2 U^T)^r Ag\\
+  &= U \Sigma^{2r} U^T U \Sigma V^T g\\
+  &= U \Sigma^{2r +1} V^T g\\
+  &= U \Sigma^{2r+1} g'
+\end{align*}
+where $g' = V^T g$ is a random vec with its coordinates independent normal, because $V^T$ has orthonormal rows and we can apply rotational invariance from lecture 1's slides ($\langle u, v \rangle = 0 \Rightarrow \langle g, u\rangle, \langle g, v\rangle$ independent; sum of norm is norm gives each coordinate is norm of mean 0 and variance still 1).
+\end{proof}
+\item \begin{proof}
+Since we know $g'_i \sim N(0, 1)$, by hint we have
+\begin{align*}
+  \Pr[|g'_i| \ge 2\sqrt{\log n}] &\le e^{-2\log n}/(2\sqrt{\log n}) = \frac{1}{2n^2\sqrt{\log n}}\\
+  \Rightarrow \Pr[\max_i |g'_i| \ge 2\sqrt{\log n}] &\le \frac{1}{2n\sqrt{\log n}} = 1/\text{poly}(n).
+\end{align*}
+Further, we have for any $\alpha$,
+\begin{align*}
+  Pr[|g_1'| < \alpha] &= \frac{2}{\sqrt{2\pi}} \int_0^\alpha e^{-x^2/2} dx\\
+  &\le \frac{\sqrt{2}}{\pi} \int_0^{\alpha} 1 dx\\
+  &= \frac{\sqrt{2}\alpha}{\pi}\\
+  &= 1/\text{poly}(n). &\text{if we take }\alpha = 1/\text{poly}(n)
+\end{align*}
+Then combining the above gives us that with high probability $1- 1/\text{poly}(n)$, both desired events occur. That is, $\max |g'_i| \le 2 \sqrt{\log n}$ and $|g'_1| \ge 1/\text{poly}(n)$.
+\end{proof}
+\item \begin{proof}
+Let $u_i$ be the $i$th column of $U$. We then have that 
+\begin{align*}
+  \|y\|_2^2 &= \|U \Sigma^{2r+1}g'\|_2^2\\
+  &= \left\|U\begin{pmatrix} \sigma_1^{2r+1} g'_1\\ \vdots \\ \sigma_n^{2r+1}g'_n \end{pmatrix}\right\|_2^2\\
+  &= \left\|\sum_{i=1}^{n} \sigma_i^{2r+1} g_i' u_i\right\|_2^2\\
+  &= \sum_{i=1}^{n} \left\| \sigma_i^{2r+1} g_i' u_i \right\|_2^2 &\text{Pythagorean since }U \text{ has orthonormal columns}\\
+  &= \sum_{i=1}^n \sigma_i^{4r+2}(g_i')^2.
+\end{align*}
+Similarly,
+\begin{align*}
+\|y^TA\|_2^2 &= \| (g')^T \Sigma^{2r+1} U^T U \Sigma V^T\|_2^2\\
+&= \| (g')^T \Sigma^{2r+2} V^T\|_2^2\\
+&= \| V \Sigma^{2r+2}g'\|_2^2\\
+&= \sum_{i=1}^n \sigma_i^{4r+4}(g'_i)^2. &\text{same reason as above}
+\end{align*}
+We can then conclude that
+\begin{align*}
+  \|u^T A\|_2^2 &= \left\| \frac{y^T}{\|y^T\|_2} A \right\|_2^2\\
+  &= \frac{\|y^T A\|_2^2}{\|y\|_2^2}\\
+  &= \frac{\sum \sigma_i^{4r+4} (g'_i)^2}{\sum \sigma_i^{4r+2}(g'_i)^2}
+\end{align*}
+as desired.
+\end{proof}
+\item \begin{proof}
+With probability $1 - 1/\text{poly}(n)$ we know $|g'_1| \ge 1/\text{poly}(n)$ and $\max |g'_i| \le 2\sqrt{\log n}$ and so 
+\begin{align*}
+  \|u^T A\|_2^2 &= \frac{\sum \sigma_i^{4r+4} (g'_i)^2}{\sum \sigma_i^{4r+2}(g'_i)^2}\\
+  &\ge \frac{\sigma_1^{4r+4}(g'_1)^2}{\sigma_1^{4r+2}(g'_1)^2 + \sum_{i=2}^n \sigma_i^{4r+2} 4\log n}\\
+  &\ge \frac{\sigma_1^{4r+4}(g'_1)^2}{\sigma_1^{4r+2}(g'_1)^2 + 4(n-1) \sigma_2^{4r+2} \log n}\\
+  &= \sigma_1^2 - \frac{4(n-1)\sigma_1^2\sigma_2^{4r+2} \log n}{\sigma_1^{4r+2}(g'_1)^2 + 4(n-1) \sigma_2^{4r+2} \log n}\\
+  &\ge \sigma_1^2 - \frac{4(n-1)\sigma_1^2 \sigma_2^{4r+2} \log n}{\sigma_1^{4r+2}(g'_1)^2}\\
+  &\ge \sigma_1^2 - \frac{4(n-1)\sigma_1^{4r+2} \sigma_2^2\log n}{2^{4r} \sigma_1^{4r+2}(g'_1)^2}\\
+  &= \sigma_1^2 - \frac{4(n-1)\log n}{2^{4r} (g'_1)^2} \sigma_2^2\\
+  &\ge \sigma_1^2 - \frac{4(n-1)\log n \text{poly}(n)^2}{16^{k\log(n/\gamma)}} \sigma_2^2 \\
+  &\hspace{150px} r = k\log(n/\gamma) = \Omega(\log(n/\gamma))\\
+  &\ge \sigma_1^2 - \frac{4(n-1)\log n \text{poly}(n)^2}{(n/\gamma)^k}\sigma_2^2\\
+  &\ge \sigma_1^2 - \gamma^k \sigma_2^2\\
+  &\hspace{150px}\text{pick }k \text{ large enough so }n^k \ge 4(n-1)\log n \text{poly}(n)^2\\
+  &\ge \sigma_1^2 - \gamma \sigma_2^2,
+\end{align*}
+where last step follows from $\gamma \le 1$.
+\end{proof}
+\item \begin{proof}
+First we may observe that with $1 - 1/\text{poly}(n)$, 
+\begin{align*}
+  \sum_{i=m+1}^n \sigma_i^{4r+2} (g'_i)^2 &\le \sum_{i=m+1}^n \sigma_i^{4r+2} (4\log n)\\
+  &\le \sum_{i=m+1}^n (1 - \gamma)^{4r+2}\sigma_1^{4r+2} (4\log n)\\
+  &\le (n-m) e^{-(4r+2)\gamma} \sigma_1^{4r+2}(4\log n)\\
+  &\le (n-m) e^{-(4k\log(n)/\gamma + 2)\gamma}\sigma_1^{4r+2}(4\log n)\\
+  &\le (n-m) n^{-4k} \sigma_1^{4r+2}(4\log n).
+\end{align*}
+So so long as $(g'_1)^2 \ge 1/\text{poly}(n)$ for any $f$ in $\text{poly}(n)$ we can find a large enough constant $k$ such that
+\begin{align*}
+  f/(g'_1)^2\sum_{i=m+1}^n \sigma_i^{4r+2} (g'_i)^2 \le \sigma_1^{4r+2}
+\end{align*}
+It then follows that
+\begin{align*}
+  \sigma_1^2 \frac{1 + (\sigma_m/\sigma_1)^2 \Theta}{1 + \Theta + 1/\text{poly}(n)} &= \sigma_1^2 \frac{(g'_1)^2 \sigma_1^{4r+2} + (\sigma_m/\sigma_1)^2 \sum_{i=2}^m (g'_i)^2 \sigma_i^{4r+2}}{(g'_1)^2 \sigma_1^{4r+2} + \sum_{i=2}^m (g'_i)^2 \sigma_i^{4r+2} + (g'_1)^2 \sigma_1^{4r+2}/\text{poly}(n)}\\
+  &= \frac{(g'_1)^2 \sigma_1^{4r+4} + (\sigma_m)^2 \sum_{i=2}^m (g'_i)^2 \sigma_i^{4r+2}}{(g'_1)^2 \sigma_1^{4r+2} + \sum_{i=2}^m (g'_i)^2 \sigma_i^{4r+2} + (g'_1)^2 \sigma_1^{4r+2}/\text{poly}(n)}\\
+  &\le \frac{\sum_{i=1}^n (g_i')^2 \sigma_i^{4r+4}}{\sum_{i=1}^m (g'_i)^2 \sigma_i^{4r+2} + (g'_1)^2 \sigma_1^{4r+2}/\text{poly}(n)}\\
+  &\le \frac{\sum_{i=1}^n (g_i')^2 \sigma_i^{4r+4}}{\sum_{i=1}^m (g'_i)^2 \sigma_i^{4r+2} + \sum_{i=m+1}^n (g'_i)^2 \sigma_i^{4r+2}}\\
+  &= \|u^T A\|_2^2. \qedhere
+\end{align*}
+\end{proof}
+\item \begin{proof}
+Since $\gamma \le 1$ we have $\Omega(\log(n/\gamma)) \ge \Omega(\log(n)) \ge \Omega(\log(n)/\gamma)$. So by $(d)$ we know in the case of $\sigma_2 \le \sigma_1/2$ the desired inequality is satisfied. So let us only focus on the case when $\sigma_2 \ge \sigma_1/2$. Then
+\begin{align*}
+  \|u^T A\|_2^2 &\ge \sigma_1^2 \frac{1 + (\sigma_m/\sigma_1)^2 \Theta}{1 + \Theta + 1/\text{poly}(n)}\\
+  &= \sigma_1^2 - \sigma_1^2\frac{\Theta + 1/\text{poly}(n) - (\sigma_m/\sigma_1)^2 \Theta}{1 + \Theta + 1/\text{poly}(n)}\\
+  &\ge \sigma_1^2 - 4\sigma_2^2\frac{\Theta + 1/\text{poly}(n) - (\sigma_m/\sigma_1)^2 \Theta}{1 + \Theta + 1/\text{poly}(n)}\\
+  &\ge \sigma_1^2 - 4\sigma_2^2\frac{\Theta + 1/\text{poly}(n) - (1-\gamma)^2 \Theta}{1 + \Theta + 1/\text{poly}(n)}\\
+  &= \sigma_1^2 - 4\sigma_2^2\frac{(2\gamma - \gamma^2)\Theta + 1/\text{poly}(n)}{\Theta + 1/\text{poly}(n) + 1}\\
+  &\ge \sigma_1^2 - 4\sigma_2^2\frac{2\gamma\Theta + 1/\text{poly}(n)}{\Theta + 1/\text{poly}(n) + 1}\\
+  &\ge \sigma_1^2 - \sigma_2^2 (8\gamma + 1/\text{poly}(n)).
+\end{align*}
+Instead of $(1-\gamma)$ threshold we can have the threshold be such that $m$ is the largest index with $\sigma_m \ge (1 - (1/16) \gamma)\sigma_1$. Also take $1/\text{poly}(n)$ to be $1/(8n^2)$. Then the proof of part $(e)$ proceeds the same way and we get
+\begin{align*}
+\|u^T A\|_2^2 &\ge \sigma_1^2 - 4\sigma_2^2 \frac{\Theta + 1/(8n^2) - (1 - (1/16)\gamma)^2 \Theta}{1 + \Theta + 1/(8n^2)}\\
+&\ge \sigma_1^2 - 4\sigma_2^2 \frac{(1/8)\gamma \Theta + 1/(8n^2)}{1 + \Theta + 1/(8n^2)}\\
+&\ge \sigma_1^2 - \sigma_2^2 ((1/2) \gamma + 1/(2n^2))\\
+&\ge \sigma_1^2 - \sigma_2^2 (\gamma/2 + \gamma/2)\\
+&= \sigma_1^2 - \gamma \sigma_2^2.
+\end{align*}
+We're done.
+\end{proof}
+\end{enumerate}
+\item \begin{proof}
+We may proceed with the power method on $(A^T, r = O(\log(n)/\gamma))$ (where $\gamma$ to be specified later) to get unit vector $w$ such that $\|w^T A^T\|_2^2 \ge \sigma_1^2 - \gamma \sigma_2^2$ with probability $1 - 1/\text{poly}(n)$. Setting final vectors $(u,v) = (Aw, w)$ then gives us that
+\begin{align*}
+  \|uv^T - A\|_F^2 &= \text{Tr}\left((uv^T - A)(vu^T - A^T)\right)\\
+  &= \text{Tr}\left(uu^T - uu^T - uu^T + AA^T\right)\\
+  &= \text{Tr}\left(-uu^T\right) + \sum_{i=1}^n \sigma_i^2\\
+  &= -\|u\|_2^2 + \sum_{i=1}^n \sigma_i^2\\
+  &= -\|Aw\|_2^2 + \sum_{i=1}^n \sigma_i^2\\
+  &\le - \sigma_1^2 + \gamma \sigma_2^2 + \sum_{i=1}^n \sigma_i^2\\
+  &= \gamma \sigma_2^2 + \|A - A_1\|_F^2\\
+  &\le (\gamma \alpha + 1) \|A - A_1\|_F^2.
+\end{align*}
+Then if we take $\gamma = \epsilon / \alpha$ we get the desired inequality. The runtime is $2r+1$ matrix-vector multiplications to get $v$ and another to get $u$, where the matrix used is always $A$ or $A^T$ so each multiplication is done in $\text{nnz}(A)$ time. Hence total time is $O(\text{nnz}(A)r) = O(\text{nnz}(A)\log(n)/\gamma) = O(\text{nnz}(A)\log(n)(1 + \alpha/\epsilon))$ (where we have plus 1 to ensure we can take $r$ as an integer).
+\end{proof}
+\end{enumerate}
+
+
+\newpage
+\question{Task 3}
+\begin{enumerate}[1.]
+\item \begin{proof}
+Let $X^*$ be the optimal solution to
+\begin{align*}
+  \min_X \|AX - B\|_F^2.
+\end{align*}
+Let $B^* = AX^* - B$. Let $A' = SA, B' = SB, \widehat{B'} = A'\widehat{X} - B'$. Then we have 
+\begin{align*}
+  \|A\widehat{X} - B\|_F^2 &= \|A(\widehat{X} - X^*)\|_F^2 + \|B^*\|_F^2 &\text{Pythagorean}\\
+  &\le 4\|A'(\widehat{X} - X^*)\|_F^2 + \|B^*\|_F^2 &\text{subspace embedding w/ prob } 19/20\\
+  &= 4\|(A'X^* - B') - (A'\widehat{X} - B')\|_F^2 + \|B^*\|_F^2\\
+  &= 4\|(A'X^* - B') - \widehat{B'}\|_F^2 + \|B^*\|_F^2\\
+  &= 4\|A'X^* - B'\|_F^2 - 4\|\widehat{B'}\|_F^2 + \|B^*\|_F^2 &\text{Pythagorean}\\
+  &\le 4\|SB^*\|_F^2 + \|B^*\|_F^2\\
+  &\le 80\|B^*\|_F^2 + \|B^*\|_F^2 &\Pr[\|SB^*\|_F^2 \ge 20\|B^*\|_F^2] \le \frac{1}{20}\\
+  &= O(1) \|AX^* - B\|_F^2
+\end{align*}
+with probability at least $1 - \frac{2}{20} = \frac{9}{10}$ by union bound as desired. Further, we can write
+\begin{align*}
+  \widehat{X} &= (SA)^{-}(SB)
+\end{align*}
+where $(SA)^{-}$ denotes the pseudoinverse of $SA$. Since $S$ is a $O(d\log d) \times n$ leverage score sampling matrix, $SB$ consists of $O(d\log d)$ (scaled and) sampled rows of $B$ and each row of $\widehat{X}$ is a linear combination of these rows by definition of row vector and matrix multiplication.
+\end{proof}
+\item \begin{proof}
+Let $S$ be a $O(k\log k) \times n$ leverage score sampling matrix for $\widehat{U}$ which is of dimension $n \times k$. As in hint, treat $A = \widehat{U}, B = A$ and let $\widehat{X} = (S\widehat{U})^-(SA)$. Applying the previous part gives us that
+\begin{align*}
+  \|\widehat{U}(S\widehat{U})^- (SA) - A\|_F^2 &=
+  \|\widehat{U} \widehat{X} - A\|_F^2 \\
+  &= O(1) \|\widehat{U} X^* - A\|_F^2 &\text{Part 1}\\
+  &\le O(1)\|\widehat{U}\widehat{V} - A\|_F^2 &X^* \text{ optimal}\\
+  &= O(1)\|A - A_k\|_F^2. &\text{low rank approximation}
+\end{align*}
+This means that $SA$ just works since $\widehat{U}(S\widehat{U})^-$ is one such solution for $U$ and the minimum must be at most $O(1)\|A - A_k\|_F^2$. Note that to get $R$ we need to express $S$ as $D \Omega^T$ where $D$ is for scaling and $\Omega^T$ is for sampling, and take $R = \Omega^T A$.
+\end{proof}
+\item \begin{proof}
+Consider the minimizing problem $\min_X \|R^T X - A^T\|_F^2$, we know from above that the minimum is $O(1)$ from $\|A - A_k\|_F^2$. We may use leverage score sampling for $R^T$ to solve the minimizing problem with $S \in \mathbb{R}^{O(k\log k \log(k\log k)) \times n} = \mathbb{R}^{O(k\log^2k) \times n}$. Let $\widehat{X}$ be the optimal solution for
+\begin{align*}
+  \min_X \|SR^TX - SA^T\|_F^2.
+\end{align*}
+Then we can express $\widehat{X} = (SR^T)^-(SA^T)$. It follows that
+\begin{align*}
+  \|(AS^T)\left((SR^T)^-\right)^TR - A\|_F^2 &=
+  \|R^T(SR^T)^-(SA^T) - A^T\|_F^2 \\
+  &= O(1)\|R^TX^* - A^T\|_F^2 &\text{part 1}\\
+  &= O(1)\|(X^*)^T R - A\|_F^2\\
+  &= O(1)\|A - A_k\|_F^2. &\text{part 2}
+\end{align*}
+Notice that $AS^T$ are sampled $O(k\log^2 k)$ columns of $A$ if we leave the scaling, so we've indeed found our valid $C$ and $R$. Yay!
+\end{proof}
+\end{enumerate}
+
+
+
+
+\end{document}
