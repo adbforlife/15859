@@ -103,19 +103,66 @@ Similarly we have $\Pr[X_2 \ge m/2] \le \exp(-\epsilon^2m/108)$. Then
 \end{align*}
 Union bound gives
 \begin{align*}
-  \Pr[\|SAx\|_{\text{med}} \notin (1 \pm \epsilon) \|Ax\|_1/m] \le 2\exp(- \epsilon^2 m /108).
+  \Pr[\|SAx\|_{\text{med}} \notin (1 \pm \epsilon) \|Ax\|_1/m] &\le 2\exp(- \epsilon^2 m /108)\\
+  &= 2\exp(-\Theta(d\log(d/\epsilon))),
 \end{align*}
-Also, by hint we may assume there is a $\gamma$-net for $\{Ax : \|x\|_1 = 1\}$ of size $\gamma^{O(d)}$.
+taking $m = \Theta(d\log(d/\epsilon)/\epsilon^2)$. Also, by hint we may assume there is a $\gamma$-net for $\{Ax : \|x\|_1 = 1\}$ of size $(d/\gamma)^{O(d)}$ while taking $\gamma = \frac{\epsilon^3}{d^3 \log^2(d/\epsilon)}$. Then by union bound we get that the probability that any vector in the net fails is at most
+\begin{align*}
+  (d/\gamma)^{O(d)}2\exp(- \Theta(d\log(d/\epsilon))) &= (d^4\log^2(d/\epsilon)/\epsilon^3)^{O(d)} 2\exp(- \Theta(d\log(d/\epsilon)))\\
+  &= 2\exp(O(d)\log(d^4\log^2(d/\epsilon)/\epsilon^3)) \exp(- \Theta(d\log(d/\epsilon)))\\
+  &\le 2\exp(O(d)\log(d^6/\epsilon^5)) \exp(- \Theta(d\log(d/\epsilon)))\\
+  &= 2\exp(O(d\log(d/\epsilon))-\Theta(d\log(d/\epsilon))).
+\end{align*}
+Note that the constant in $O(d\log(d/\epsilon))$ is at universal and does not dependent on $\gamma$, so we can choose constants in $\Theta(d\log(d/\epsilon))$ large enough (by choosing the constants for $m$ large enough) so that the probability of failure is still exponentially small in $\Theta(d\log(d/\epsilon))$.
 
-BLUH BLUH BLUH 
-
-Now, take an arbitrary vector $x$ such that $\|x\|_1 = 1$. Take a vector $y$ in the $\gamma$-net such that $\|Ax - y\|_1 \le \gamma$. Then we have that 
-
+Now, take an arbitrary vector $x$ such that $\|x\|_1 = 1$. Take a vector $y$ in the $\gamma$-net such that $\|Ax - y\|_1 \le \gamma$. Note we have that $\|SAx\|_\infty \le \|SAx\|_1 \le O(d\log d)\|Ax\|_1$ for all $x$ for constant 9/10 probability, by hints 1 and 3. Also we may assume that $A$ is an Auerbach basis since proof for any basis extends to all $x$ for original $A$ since the column spans are the same. Then so
+\begin{align*}
+  \|SAx\|_{\text{med}} &= \|Sy + S(Ax - y)\|_{\text{med}}\\
+  &\in \|Sy\|_{\text{med}} \pm \|S(Ax - y)\|_\infty\\
+  &\subseteq \|Sy\|_{\text{med}} \pm O(d\log d)\|Ax - y\|_1\\
+  &\subseteq \|Sy\|_{\text{med}} \pm O(d\log d) \gamma\\
+  &= \|Sy\|_{\text{med}} \pm O\left(d\log(d/\epsilon) \frac{\epsilon^3}{d^3 \log^2(d/\epsilon)}\right)\\
+  &= \|Sy\|_{\text{med}} \pm O\left(\frac{\epsilon^3}{d^2 \log(d/\epsilon)}\right)\\
+  &= \|Sy\|_{\text{med}} \pm O\left(\frac{\epsilon}{dm}\right)\\
+  &= \|Sy\|_{\text{med}} \pm O(\|x\|_\infty \epsilon/m) &\|x\|_1 = 1\\
+  &= \|Sy\|_{\text{med}} \pm O\left(\epsilon\frac{\|Ax\|_1}{m}\right). &\text{Auerbach basis}
+\end{align*}
+Further, since $\gamma = O\left(\epsilon \frac{\|Ax\|_1}{m}\right)$ for same reasoning above we have
+\begin{align*}
+  \|SAx\|_{\text{med}} &\in \|Sy\|_{\text{med}} \pm O\left(\epsilon\frac{\|Ax\|_1}{m}\right)\\
+  &\subseteq (1 \pm \epsilon)(\|y\|_1/m) \pm O(\epsilon\|Ax\|_1/m)\\
+  &\subseteq (1 \pm \epsilon)(\|Ax\|_1/m + \|Ax - y\|_1/m) \pm O(\epsilon\|Ax\|_1/m)\\
+  &\subseteq (1 \pm \epsilon)(\|Ax\|_1/m + \gamma/m) \pm O(\epsilon\|Ax\|_1/m)\\
+  &= (1 \pm O(\epsilon))(\|Ax\|_1/m).
+\end{align*}
+Finally, we can scale $O(\epsilon)$ to have constant 1 by scaling constants chosen for $m$ appropriately and achieve our desired result.
 \end{proof}
 
 \newpage
 \question{Task 2}
-
+\begin{proof}
+Suppose we just use a countsketch matrix $S$ of dimension $k \times n$ with $k = O(\gamma \epsilon^{-2})$, kept track of using seeds for the hashes. Then total space usage is just $O(\gamma \epsilon^{-2} \log(n))$ due to bit sizes for each entry. To be more precise, we have a dimension $k$ vector $y$ initialized to 0. For each update $x_i \leftarrow x_i + a$ we perform $y \leftarrow y + S(ae_i) = y + aS_{*i}$. Note we don't store the column $S_{*i}$ anywhere and we simply find the location of vector $y$ to update. We eventually obtain $Su, Sv,$ and a $(1 \pm \epsilon/2)$ approximation $a$ to $\|u\|_2^2$ and we want to approximate $\|u + v\|_2^2$. To do this, we may output
+\begin{align*}
+  a + \|Sv\|_2^2 + 2\langle Su, Sv \rangle.
+\end{align*}
+We shall argue that given corret constants for $k$ we shall obtain a correct approximation. Given our $S$, the JL property from class still holds. That is, for all $\|x\|_2 = 1$, $\mathbb{E}_S\left|\|Sx\|_2^2 - 1\right|^2 \le \epsilon^2 \delta$, so long as $k = \frac{2}{\epsilon^2 \delta}$. In the proof for approximate matrix product from class we have that for arbitrary vectors $x,y$,
+\begin{align*}
+  \frac{\mathbb{E}|\langle Sx, Sy \rangle - \langle x, y \rangle|}{\|x\|_2 \|y\|_2} &\le 3 \epsilon \delta^{1/2}\\
+  \Pr[|\langle Sx, Sy \rangle - \langle x, y \rangle| \ge 60\epsilon \delta^{1/2} \|x\|_2 \|y\|_2] &\le \frac{1}{20}.
+\end{align*}
+Take $\delta = c/\gamma$ where $c$ is a constant gives us correct $k$. We determine this $c$ later. Hence with at least 9/10 probability (by union bound) we have that
+\begin{align*}
+  &\begin{cases}
+  |\langle Su, Sv \rangle - \langle u, v \rangle| \le 60 \epsilon \delta^{1/2} \|u\|_2\|v\|_2 \le 60 \epsilon \delta^{1/2} \sqrt{\gamma} \|u\|_2^2\\
+  |\langle Sv, Sv \rangle - \langle v, v \rangle| \le 60 \epsilon \delta^{1/2} \sqrt{\gamma} \|u\|_2^2
+  \end{cases}\\
+  \Rightarrow a + \|Sv\|_2^2 + 2\langle Su, Sv \rangle &= (1 \pm \epsilon/2) \|u\|_2^2 + \|v\|_2^2 + 2\langle u, v\rangle \pm 180\epsilon \delta^{1/2} \sqrt{\gamma} \|u\|_2^2\\
+  &= \|u\|_2^2 + \|v\|_2^2 + 2\langle u, v\rangle \pm (\epsilon/2 + 180\epsilon \sqrt{c}) \|u\|_2^2\\
+  &= \|u + v\|_2^2 \pm \epsilon\|u\|_2^2 &c = 1/360^2\\
+  &= (1 \pm \epsilon)\|u + v\|_2^2.
+\end{align*}
+Hence our algorithm behaves as desired.
+\end{proof}
 
 
 
