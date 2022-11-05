@@ -1,0 +1,122 @@
+% You should title the file with a .tex extension (hw1.tex, for example)
+\documentclass[11pt]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{enumerate}
+\usepackage[hang,flushmargin]{footmisc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{collectbox}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage[T1]{fontenc}
+\usepackage{complexity}
+
+\newcommand{\mybox}{%
+    \collectbox{%
+        \setlength{\fboxsep}{4pt}%
+        \fbox{\BOXCONTENT}%
+    }%
+}
+
+\newcommand{\legendre}[2]{\ensuremath{\left( \frac{#1}{#2} \right) }}
+
+\oddsidemargin0cm
+\topmargin-2cm     %I recommend adding these three lines to increase the 
+\textwidth16.5cm   %amount of usable space on the page (and save trees)
+\textheight23.5cm  
+
+\newcommand{\question}[1] {\vspace{.3in} \hrule\vspace{0.3em}
+\noindent{\bf #1} \vspace{0.7em}
+\hrule \vspace{.10in}}
+\renewcommand{\part}[1] {\vspace{.10in} {\bf (#1)}}
+
+\newcommand{\myinfo}{Albert Gao / sixiangg}
+\newcommand{\myhwnum}{3}
+\newcommand{\currdate}{11/03/2022}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+ 
+\pagestyle{fancyplain}
+\lhead{\fancyplain{}{\textbf{HW\myhwnum}}}      % Note the different brackets!
+\rhead{\fancyplain{}{\bigskip\myinfo}}
+\chead{\fancyplain{}{15-859}}
+
+\begin{document}
+
+\bigskip                        % Skip a "medium" amount of space
+                                % (latex determines what medium is)
+                                % Also try: \bigskip, \littleskip
+
+\thispagestyle{plain}
+\begin{center}                  % Center the following lines
+{\Huge 15-859 Assignment \#\myhwnum}
+
+\vspace{0.3cm}
+
+\large{\myinfo { / section 1A}}
+
+\large{\currdate}
+
+\end{center}
+
+\question{Task 1}
+\begin{proof}
+Note that to prove claim for all $\mathbb{R}^d$ we just need to show for all $x \in \mathbb{R}^d$ with $\|x\|_1 = 1$ by a scaling argument. We first fix $x$ with $\|x\|_1 = 1$ and try to show $SAx$ good. We focus on just the $i$th row of $SAx$ and observe that
+\begin{align*}
+  (SAx)_i &= \langle (Z_1/m, \cdots, Z_n/m)^T, Ax \rangle &Z_j \text{i.i.d. standard Cauchy}\\
+  &= \sum_{j=1}^n \frac{(Ax)_j}{m}Z_j\\
+  &= \left\| \frac{Ax}{m}\right\|_1 Z &\text{1 norm invariance}\\
+  \Rightarrow |(SAx)_i| &= \frac{1}{m} \|Ax\|_1 |Z|.
+\end{align*}
+Using the cdf of Cauchy we have that
+\begin{align*}
+  \Pr[|Z| < 1 - \epsilon] &= \frac{2}{\pi} \arctan\left(1 - \epsilon\right)\\
+  &\le \frac{2}{\pi} \left( \frac{\pi}{4} - \frac{\epsilon}{2} \right)\\
+  &\le \frac{1}{2} - \frac{\epsilon}{6}.
+\end{align*}
+The inequality uses observation that $\arctan$ is concave on $x \ge 0$ and is thus upper bounded by the tangent line at $x = 1$. Further, for $\epsilon < \sqrt{3} - 1$, $\arctan(1 + \epsilon)$ is lower bounded by line segment from $(1, \pi/4), (\sqrt{3}, \pi/3)$. Hence
+\begin{align*}
+  \Pr[|Z| < 1 + \epsilon] &= \frac{2}{\pi} \arctan\left(1 + \epsilon\right)\\
+  &\ge \frac{2}{\pi} \left(\frac{\pi}{4} + \frac{\epsilon}{\sqrt{3}-1} \left(\frac{\pi}{3} - \frac{\pi}{4}\right)\right)\\
+  &= \frac{1}{2} + \frac{2\epsilon}{\sqrt{3} - 1} \frac{1}{12}\\
+  &\ge \frac{1}{2} + \frac{\epsilon}{6}\\
+  \Rightarrow \Pr[|Z| > 1 + \epsilon] &\le \frac{1}{2} - \frac{\epsilon}{6}.
+\end{align*}
+Then let $X_1$ denote the sum of $m$ i.i.d. Bernoulli r.v. each of which is 1 iff $|Z| < 1 - \epsilon$. Let $X_2$ denote sum of $m$ Bernoullis each of which is 1 iff $|Z| > 1 + \epsilon$. Then
+\begin{align*}
+  \Pr[X_1 \ge m/2] &= \Pr[X_1 \ge (1 + \delta)m(1/2 - \epsilon/6)] &\delta = \frac{\epsilon/6}{1/2 - \epsilon/6}\\
+  &\le \Pr[X_1 \ge (1 + \delta)\mathbb{E}X_1] &\text{by analysis above}\\
+  &\le \exp\left(-\delta^2 \mathbb{E}X_1/ (2 + \delta)\right) &\text{Chernoff}\\
+  &\le \exp\left(-\delta^2m/4(2 + \delta)\right) &\text{for small enough constant }\epsilon\\
+  &\le \exp\left(-(\epsilon^2/9)m(1/12)\right) &\delta \in [\epsilon/3, 1] \text{ for small enough }\epsilon\\
+  &= \exp(-\epsilon^2m/108).
+\end{align*}
+Similarly we have $\Pr[X_2 \ge m/2] \le \exp(-\epsilon^2m/108)$. Then
+\begin{align*}
+  \Pr[\|SAx\|_{\text{med}} < (1 - \epsilon)\|Ax\|_1/m] &\le \Pr[X_1 \ge m/2] \le \exp(-\epsilon^2 m / 108).
+\end{align*}
+Union bound gives
+\begin{align*}
+  \Pr[\|SAx\|_{\text{med}} \notin (1 \pm \epsilon) \|Ax\|_1/m] \le 2\exp(- \epsilon^2 m /108).
+\end{align*}
+Also, by hint we may assume there is a $\gamma$-net for $\{Ax : \|x\|_1 = 1\}$ of size $\gamma^{O(d)}$.
+
+BLUH BLUH BLUH 
+
+Now, take an arbitrary vector $x$ such that $\|x\|_1 = 1$. Take a vector $y$ in the $\gamma$-net such that $\|Ax - y\|_1 \le \gamma$. Then we have that 
+
+\end{proof}
+
+\newpage
+\question{Task 2}
+
+
+
+
+\end{document}
